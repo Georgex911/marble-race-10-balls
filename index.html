@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marble Race of Doom 🏁🥀</title>
+    <style>
+        body { background: #111; color: #fff; font-family: monospace; text-align: center; }
+        canvas { border: 3px solid #f00; background: #222; }
+        h1 { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>FUCKING MARBLE RACE WITH 10 BALLS OF CHAOS 🏎️💀💔</h1>
+    <p>Watch these bastards race to their inevitable deaths. Refresh to restart the carnage.</p>
+    <canvas id="race" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('race');
+        const ctx = canvas.getContext('2d');
+
+        let marbles = [];
+        const numMarbles = 10;
+        const trackWidth = 60;
+        const startY = 50;
+
+        class Marble {
+            constructor(x, color, name) {
+                this.x = x;
+                this.y = startY;
+                this.radius = 20;
+                this.speed = Math.random() * 4 + 2;
+                this.color = color;
+                this.name = name;
+                this.finished = false;
+                this.wobble = 0;
+            }
+
+            update() {
+                if (!this.finished) {
+                    this.y += this.speed;
+                    this.wobble = Math.sin(this.y / 10) * 3;
+                    if (this.y > 550) {
+                        this.finished = true;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + this.wobble, this.y);
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.restore();
+
+                // Label
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px monospace';
+                ctx.fillText(this.name, this.x - 10, this.y + 5);
+            }
+        }
+
+        function initMarbles() {
+            marbles = [];
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#800080', '#ffc0cb', '#a52a2a'];
+            const names = ['Cunt1', 'Bastard2', 'Fuckboi3', 'Shit4', 'Ass5', 'Dick6', 'Twat7', 'Wanker8', 'Prick9', 'Bitch10'];
+            for (let i = 0; i < numMarbles; i++) {
+                const laneX = 100 + i * trackWidth;
+                marbles.push(new Marble(laneX, colors[i], names[i]));
+            }
+        }
+
+        function drawTrack() {
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 5;
+            for (let i = 0; i < numMarbles; i++) {
+                const x = 100 + i * trackWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, 600);
+                ctx.stroke();
+            }
+            // Finish line
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(50, 550);
+            ctx.lineTo(750, 550);
+            ctx.stroke();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawTrack();
+
+            let allFinished = true;
+            marbles.forEach(m => {
+                m.update();
+                m.draw();
+                if (!m.finished) allFinished = false;
+            });
+
+            // Winner check
+            if (allFinished) {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#f00';
+                ctx.font = 'bold 40px monospace';
+                const winner = marbles.reduce((prev, curr) => prev.y < curr.y ? prev : curr); // first to finish? wait y increases down
+                ctx.fillText(`WINNER: ${winner.name} (lmao the rest are dead) 🥀`, 100, 300);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        initMarbles();
+        animate();
+    </script>
+</body>
+</html>
